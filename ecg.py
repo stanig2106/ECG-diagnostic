@@ -31,6 +31,7 @@ class ECG:
         label: str
         points: np.ndarray
         sampling_rate: int
+        metadata: Optional[dict] = None
 
         def __init__(self, label: str, points: np.ndarray, sampling_rate: int):
             self.label = str.strip(label)

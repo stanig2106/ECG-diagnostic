@@ -1,9 +1,7 @@
-from typing import TYPE_CHECKING
 import neurokit2 as nk
-from scipy.ndimage import median_filter
+import numpy as np
 
-if TYPE_CHECKING:
-    from ecg import ECG
+from ecg import ECG
 
 
 class LineTreatment:
@@ -18,19 +16,21 @@ class LineTreatment:
         ecg.treated_lines = [line.copy(line.label + " (treated)") for line in
                              ecg.lines]
         for line in ecg.treated_lines:
-            line.points = nk.signal_filter(
-                line.points, sampling_rate=line.sampling_rate,
-                lowcut=0.5, highcut=45, method="butterworth", order=5
-            )
-            LineTreatment.baseline_correct(line)
+            line.points = nk.ecg_clean(line.points,
+                                       sampling_rate=line.sampling_rate,
+                                       method="neurokit")
 
     @staticmethod
-    def baseline_correct(line: 'ECG.Line') -> None:
-        """
-        Corriger la ligne de base ECG pour éliminer la dérive.
-        Utilise un filtrage médian pour une correction robuste.
-        """
-        window_size = int(
-            (LineTreatment.BASELINE_WINDOW_SIZE_MS / 1000) * line.sampling_rate)
-        baseline = median_filter(line.points, size=window_size)
-        line.points = line.points - baseline
+    def merge_ecg(ecg: 'ECG'):
+        if any([line.sampling_rate != ecg.treated_lines[0].sampling_rate for
+                line in ecg.treated_lines]):
+            raise ValueError("All lines must have the same sampling rate.")
+        if any([line.points.shape[0] != ecg.treated_lines[0].points.shape[0] for
+                line in ecg.treated_lines]):
+            raise ValueError("All lines must have the same length.")
+
+        treated_points = [np.asarray(line.points) for line in ecg.treated_lines]
+        merged = np.mean(treated_points, axis=0)
+
+        ecg.treated_lines += [
+            ECG.Line("Merged", merged, ecg.treated_lines[0].sampling_rate)]

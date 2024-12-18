@@ -5,53 +5,80 @@ class Calculation:
     ecg: 'ECG'
 
     def __init__(self, ecg: 'ECG'):
+        """
+        Initialise l'objet Calculation avec une instance de la classe ECG.
+        """
         self.ecg = ecg
 
     def pr_intervals(self) -> [int]:
         """
-        PR intervals in milliseconds.
+        Retourne les durées des intervalles PR en millisecondes.
         """
-        pass
+        return self.ecg.get_pr_intervals()
 
     def pr_segments(self) -> [int]:
         """
-        PR segments in milliseconds.
+        Retourne les durées des segments PR en millisecondes.
         """
-        pass
+        return self.ecg.get_pr_segments()
 
     def qrs_complexes(self) -> [int]:
         """
-        QRS durations in milliseconds.
+        Retourne les durées des complexes QRS en millisecondes.
         """
-        pass
+        return self.ecg.get_qrs_durations()
 
     def qt_intervals(self) -> [int]:
         """
-        QT intervals in milliseconds.
+        Retourne les durées des intervalles QT en millisecondes.
         """
-        pass
+        return self.ecg.get_qt_intervals()
 
     def st_segments(self) -> [int]:
         """
-        ST segments in milliseconds.
+        Retourne les déviations du segment ST en millivolts (converti en millisecondes si nécessaire).
         """
-        pass
+        return self.ecg.get_st_segments()
 
-    def periods(self) -> [int]
+    def rr_intervals(self) -> [int]:
         """
-        Return time of each period in milliseconds.
-        A period is the time between two R-peaks.
+        Retourne les intervalles RR en millisecondes (temps entre deux pics R successifs).
         """
-        pass
+        return self.ecg.get_rr_intervals()
 
     def heart_rate(self) -> int:
         """
-        Heart rate in beats per minute. (mean)
+        Calcule et retourne la fréquence cardiaque moyenne en battements par minute (bpm).
         """
-        pass
+        rr = self.rr_intervals()
+        return int(60000 / (sum(rr) / len(rr))) if rr else 0
 
     def age_of_patient(self) -> int:
         """
-        Age of the patient in years.
+        Retourne l'âge du patient en années.
         """
-        pass
+        return self.ecg.get_patient_age()
+
+    def p_wave_amplitudes(self) -> [float]:
+        """
+        Retourne les amplitudes des ondes P en millivolts.
+        """
+        return self.ecg.get_p_wave_amplitudes()
+
+    def qrs_amplitudes(self) -> [float]:
+        """
+        Retourne les amplitudes maximales des complexes QRS en millivolts.
+        """
+        return self.ecg.get_qrs_amplitudes()
+
+    def t_wave_amplitudes(self) -> [float]:
+        """
+        Retourne les amplitudes des ondes T en millivolts.
+        """
+        return self.ecg.get_t_wave_amplitudes()
+
+    def electrical_axis_qrs(self) -> float:
+        """
+        Retourne l'axe électrique du complexe QRS en degrés.
+        """
+        return self.ecg.get_qrs_axis()
