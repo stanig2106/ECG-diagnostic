@@ -53,14 +53,23 @@ class Plot:
             plotted_lines.append(plot_line)
 
             # Plot the peaks as scatter points
-            peaks_idx = line.metadata and line.metadata.values() or []
+            waves_idx = line.metadata and line.metadata.values() or []
             # flatten
-            peaks_idx = [item for sublist in peaks_idx for item in sublist]
-            peak_points_line = ax.scatter([i for i in peaks_idx if not i != i],
-                                          [line.points[i] for i in peaks_idx if
+            waves_idx = [item for sublist in waves_idx for item in sublist]
+
+            peak_points_line = ax.scatter([i for i in waves_idx if not i != i],
+                                          [line.points[i] for i in waves_idx if
                                            not i != i],
                                           color=plot_line.get_color())
-            peak_points.append(peak_points_line)
+            # peak_points_line = ax.scatter(waves_idx[1], [line.points[i] for i in
+            #                                              waves_idx[1]],
+            #                               color=plot_line.get_color())
+            # start_points = ax.scatter(waves_idx[0], [line.points[i] for i in waves_idx[0]],
+            #                             color=plot_line.get_color(), marker='s')
+            # end_points = ax.scatter(waves_idx[2], [line.points[i] for i in waves_idx[2]],
+            #                         color=plot_line.get_color(), marker='*')
+
+            peak_points.append([peak_points_line])
 
         return plotted_lines, peak_points
 
@@ -75,7 +84,9 @@ class Plot:
                     # Toggle visibility
                     visible = not orig_line.get_visible()
                     orig_line.set_visible(visible)
-                    peak_point.set_visible(visible)
+                    if peak_point:
+                        for pp in peak_point:
+                            pp.set_visible(visible)
                     l_leg.set_alpha(1.0 if visible else 0.2)
                     fig.canvas.draw()
 
@@ -92,7 +103,9 @@ class Plot:
                 for legline, origline, peakpoint in zip(
                         legend.get_lines(), plotted_lines, peak_points):
                     origline.set_visible(False)  # Hide the line
-                    peakpoint.set_visible(False)  # Hide the points
+                    if peakpoint:
+                        for pp in peakpoint:
+                            pp.set_visible(False)
                     legline.set_alpha(0.2)  # Semi-transparent legend
                 fig.canvas.draw()
 
